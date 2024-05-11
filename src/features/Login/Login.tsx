@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-const BASE_URL = 'https://chola-web-app.azurewebsites.net/api';
-
-interface Props {
-  onLogin: () => void; // Define the type for the onLogin prop
-}
-
-const Login: React.FC<Props> = ({ onLogin }) => { // Receive the onLogin prop
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,28 +14,10 @@ const Login: React.FC<Props> = ({ onLogin }) => { // Receive the onLogin prop
     setPassword(event.target.value);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/auth/admin-login`,
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      const token = response.data.jwt;
-      localStorage.setItem('jwtToken', token);
-      onLogin(); // Call the onLogin function
-      navigate('/');
-    } catch (error) {
-      console.error('Login error:', error);
-    }
+    // For the UI-only version, you can simulate a successful login by navigating to another page
+    navigate('/dashboard');
   };
 
   return (

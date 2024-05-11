@@ -14,6 +14,8 @@ import ApiTable from '../Tables/ConfigApi/Api';
 import NotificationTable from '../Tables/Notification/NotificationTable';
 import AccountUpdate from '../components/AccountUpdate';
 import UserLogsTable from '../components/UserLogs';
+import CarManagement from '../Tables/WareHouseManagment/CarManagment';
+import DriverCarApproval from '../Tables/WareHouseManagment/DriverCarApprovals';
 const Navigation: React.FC = () => {
   const [open, setOpen] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
@@ -59,6 +61,8 @@ const Navigation: React.FC = () => {
                 <Route path='/notifications' element={<NotificationTable notifications={[]} />} />
                 <Route path='/accountUpdate' element={<AccountUpdate/>}/>
                 <Route path='/user-logs' element={<UserLogsTable/>}/>
+                <Route path='/CarManagement' element={<CarManagement/>}/>
+                <Route path='/driver-Requests' element={<DriverCarApproval/>}/>
 
               </>
             ) : (
