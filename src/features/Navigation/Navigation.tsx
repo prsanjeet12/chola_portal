@@ -68,9 +68,10 @@ const Navigation: React.FC = () => {
             ) : (
               <Route
                 path="/login"
-                element={<Login onLogin={handleLogin} />} 
+                element={<Login  />} 
               />
             )}
+            {/* onLogin={handleLogin} */}
           
             <Route
               path="*"
