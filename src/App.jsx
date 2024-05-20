@@ -1,14 +1,15 @@
 
+import { Layout } from 'antd';
 import './App.css';
 import Navigation from './features/Navigation/Navigation'
 
 function App() {
   return (
-    <div className=" font-montserrat 
+    <Layout className="font-montserrat 
     ">
 
       <Navigation/>
-    </div>
+    </Layout>
   );
 }
 

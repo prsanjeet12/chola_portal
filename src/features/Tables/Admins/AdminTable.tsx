@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Table, Button, Tag, Select, Input, Drawer, Form, InputNumber,Space } from 'antd';
+import { Table, Button, Tag, Select, Input, Drawer, Space,Descriptions } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-const { Search } = Input;
+import { IoMdDocument } from "react-icons/io";
 const { Option } = Select;
 
-
-// Define the type for a row of data
 interface RowData {
   key: React.Key;
   name: string;
@@ -17,9 +15,13 @@ interface RowData {
   updatedOn: string;
   companyCode: string;
   company: string;
+  isActive: string;
+  isDeleted: string;
+  state: string;
+  district: string;
+  contactNumber: string;
 }
 
-// Sample data
 const dataSource: RowData[] = [
   {
     key: '1',
@@ -32,6 +34,11 @@ const dataSource: RowData[] = [
     updatedOn: '2023-01-02',
     companyCode: 'ABC123',
     company: 'ABC Inc.',
+    isActive: "Yes",
+    isDeleted: "No",
+    state: "State 1",
+    district: "District 1",
+    contactNumber: "1234567890"
   },
   {
     key: '2',
@@ -44,103 +51,17 @@ const dataSource: RowData[] = [
     updatedOn: '2023-01-04',
     companyCode: 'DEF456',
     company: 'XYZ Corp.',
+    isActive: "No",
+    isDeleted: "Yes",
+    state: "State 2",
+    district: "District 2",
+    contactNumber: "0987654321"
   },
-  // Add more rows as needed
-];
-
-const columns = [
-  {
-    title:<span className='font-bold text-[14px]'>Name</span>,
-    dataIndex: 'name',
-    key: 'name',
-   
-  },
-  {
-    title: <span className='font-bold text-[14px]'>Email</span>,
-    dataIndex: 'email',
-    key: 'email',
-  },
-  {
-    title: <span className='font-bold text-[14px]'>Role</span>,
-    dataIndex: 'role',
-    key: 'role',
-    render: (role:any) => {
-      let color = '';
-      let text = '';
-
-      switch (role) {
-        case 'superadmin':
-          color = 'red';
-          text = 'Super Admin';
-          break;
-        case 'subadmin':
-          color = 'blue';
-          text = 'Sub Admin';
-          break;
-        case 'repersantive':
-          color = 'purple';
-          text = 'Repersantive';
-          break;
-        case 'editor':
-          color = 'purple';
-          text = 'Editor';
-          break;
-        default:
-          color = 'gray';
-          text = 'Unknown';
-      }
-
-      return <Tag color={color}>{text}</Tag>;
-    },
-  },
-  {
-    title: <span className='font-bold text-[14px]'>Banned</span>,
-    dataIndex: 'isBanned',
-    key: 'isBanned',
-    render: (isBanned: boolean) => (
-      <Tag color={isBanned ? 'red' : 'green'}>
-        {isBanned ? 'Yes' : 'No'}
-      </Tag>
-    ),
-  },
-  {
-    title: <span className='font-bold text-[14px]'>Banned Reason</span>,
-    dataIndex: 'bannedReason',
-    key: 'bannedReason',
-    width:140,
-  },
-  // {
-  //   title: <span className='font-bold text-[14px]'>Created On</span>,
-  //   dataIndex: 'createdOn',
-  //   key: 'createdOn',
-  // },
-  {
-    title: <span className='font-bold text-[14px]'>Company Code</span>,
-    dataIndex: 'companyCode',
-    key: 'companyCode',
-  },
-  {
-    title: <span className='font-bold text-[14px]'>Company</span>,
-    dataIndex: 'company',
-    key: 'company',
-  },
-  {
-    title: <span className='font-bold text-[14px]'>Actions</span>,
-    key: 'action',
-    render: (text: any, record: RowData) => (
-      <Space>
-        <Button onClick={() => handleView()} icon={<EyeOutlined />} />
-        <Button  onClick={() => handleUpdate(record)} icon={<EditOutlined />} />
-        <Button  onClick={() => handleDelete(record)} danger icon={<DeleteOutlined />} />
-      </Space>
-    ),
-  },
+ 
 ];
 
 
-const handleView=()=>{
-  console.log("View clicked");
-}
+
 const handleUpdate = (record: RowData) => {
   console.log('Update clicked for record:', record);
 }
@@ -148,45 +69,133 @@ const handleUpdate = (record: RowData) => {
 const handleDelete = (record: RowData) => {
   console.log('Delete clicked for record:', record);
 }
+
 const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
   console.log(event.target.value);
   // Implement search functionality here
 };
-const handleAddAdmin = () => {
-  // Implement logic to add a new admin
-  console.log("Adding new admin...");
-};
-
-const handleAction = (record: RowData) => {
-  console.log('Action clicked for record:', record);
-};
 
 export default function AdminTable() {
-  const [visible, setVisible] = useState<boolean>(false);
+  const [isAddDrawerVisible, setIsAddDrawerVisible] = useState<boolean>(false);
+  const [isViewDrawerVisible, setIsViewDrawerVisible] = useState<boolean>(false);
+  const [selectedRecord, setSelectedRecord] = useState<RowData | null>(null);
 
-  const showDrawer = () => {
-    setVisible(true);
+
+  const columns = [
+    {
+      title: <span className='font-bold text-[14px]'>Name</span>,
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Email</span>,
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Role</span>,
+      dataIndex: 'role',
+      key: 'role',
+      render: (role: any) => {
+        let color = '';
+        let text = '';
+  
+        switch (role) {
+          case 'superadmin':
+            color = 'red';
+            text = 'Super Admin';
+            break;
+          case 'subadmin':
+            color = 'blue';
+            text = 'Sub Admin';
+            break;
+          case 'repersantive':
+            color = 'purple';
+            text = 'Repersantive';
+            break;
+          case 'editor':
+            color = 'purple';
+            text = 'Editor';
+            break;
+          default:
+            color = 'gray';
+            text = 'Unknown';
+        }
+  
+        return <Tag color={color}>{text}</Tag>;
+      },
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Banned</span>,
+      dataIndex: 'isBanned',
+      key: 'isBanned',
+      render: (isBanned: boolean) => (
+        <Tag color={isBanned ? 'red' : 'green'}>
+          {isBanned ? 'Yes' : 'No'}
+        </Tag>
+      ),
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Banned Reason</span>,
+      dataIndex: 'bannedReason',
+      key: 'bannedReason',
+      width: 140,
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Company Code</span>,
+      dataIndex: 'companyCode',
+      key: 'companyCode',
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Company</span>,
+      dataIndex: 'company',
+      key: 'company',
+    },
+    {
+      title: <span className='font-bold text-[14px]'>Actions</span>,
+      key: 'action',
+      render: (text: any, record: RowData) => (
+        <Space>
+          <Button onClick={() => handleView(record)} icon={<EyeOutlined />} />
+          <Button onClick={() => handleUpdate(record)} icon={<EditOutlined />} />
+          <Button onClick={() => handleDelete(record)} danger icon={<DeleteOutlined />} />
+        </Space>
+      ),
+    },
+  ];
+  
+  const showAddDrawer = () => {
+    setIsAddDrawerVisible(true);
   };
 
-  const onClose = () => {
-    setVisible(false);
+  const showViewDrawer = (record: RowData) => {
+    setSelectedRecord(record);
+    setIsViewDrawerVisible(true);
+  };
+
+  const closeAddDrawer = () => {
+    setIsAddDrawerVisible(false);
+  };
+
+  const closeViewDrawer = () => {
+    setIsViewDrawerVisible(false);
+    setSelectedRecord(null);
+  };
+
+  const handleView = (record: RowData) => {
+    showViewDrawer(record);
   };
 
   return (
-    <div className="overflow-x-auto font-montserrat">
-      <div className='bg-[#fffff]  mt-20 ml-10 mr-10'>
-        
-
-
-        <div  className="bg-white pt-6 pl-8 pb-8  " style={{ display: 'flex', gap: '10px' }}>
+    <div className="overflow-x-auto 
+    font-montserrat bg-[#e6e8f2] h-full">
+      <div className='bg-[#fffff] 
+    p-4'>
+        <div className="bg-white pt-6 pl-8 pb-8" style={{ display: 'flex', gap: '10px' }}>
           {/* Dropdown for Role */}
-          <Select  defaultValue="Role" style={{  height: 50, width: 320, gap: 10 }}>
-          
-            <Option    value="admin">Admin</Option>
+          <Select defaultValue="Role" style={{ height: 50, width: 320, gap: 10 }}>
+            <Option value="admin">Admin</Option>
             <Option value="subAdmin">Sub Admin</Option>
-           
-           
-            {/* Add more role options here */}
           </Select>
 
           {/* Dropdown for Banned */}
@@ -201,9 +210,8 @@ export default function AdminTable() {
             <Option value="no">No</Option>
           </Select>
         </div>
-        <div className="flex bg-white justify-between items-center ">
+        <div className="flex bg-white justify-between items-center">
           <div className="flex xl:pl-[500px]">
-            {/* Search Input */}
             <input
               type="text"
               placeholder="Search Admin"
@@ -214,33 +222,31 @@ export default function AdminTable() {
           </div>
           <div>
             <button
-          className='hover:animate-bounce font-montserrat
-           px-4 py-2 mr-8 opacity-1 duration-100
-            text-white rounded-lg bg-black shadow-2xl '
-              onClick={showDrawer}>Add New Admin</button>
+              className='hover:animate-bounce font-montserrat px-4 py-2 mr-8 opacity-1 duration-100 text-white rounded-lg bg-black shadow-2xl'
+              onClick={showAddDrawer}
+            >
+              Add New Admin
+            </button>
           </div>
         </div>
-        {/* className='  
-              mr-8
-               bg-black font-semibold py-2 rounded-md
-                px-4 text-white inline-block' */}
         <Table
-        
           dataSource={dataSource}
           columns={columns}
-    
-          className='font-semibold font-montserrat'
+          size='small'
+          className=' font-montserrat  bg-white text-black custom-table 
+          overflow-hidden  font-semibold'
         />
       </div>
+
       <Drawer
-  title="Add New Admin"
-  placement="right"
-  width={400}
-  onClose={onClose}
-  visible={visible}
-  destroyOnClose={true}
->
-<form className="max-w-lg mx-auto mt-6 space-y-6">
+        title="Add New Admin"
+        placement="right"
+        width={400}
+        onClose={closeAddDrawer}
+        visible={isAddDrawerVisible}
+        destroyOnClose={true}
+      >
+       <form className="max-w-lg mx-auto mt-6 space-y-6">
   <div className="flex flex-wrap">
     {/* <label htmlFor="fullName" className="block text-gray-700 text-sm font-bold mb-2">
       Full Name
@@ -432,7 +438,7 @@ export default function AdminTable() {
       </button>
       <button
         type="button"
-        onClick={onClose}
+        // onClick={onClose}
         className="bg-white 
         border-[2px] border-yellow-300
        
@@ -443,7 +449,31 @@ export default function AdminTable() {
       </button>
     </div>
 </form>
-</Drawer>
+      </Drawer>
+
+      <Drawer
+        title="Admin Details"
+        placement="right"
+        width={400}
+        onClose={closeViewDrawer}
+        visible={isViewDrawerVisible}
+        destroyOnClose={true}
+      >
+        {selectedRecord && (
+          <div className='font-montserrat font-semibold'>
+            <Descriptions  bordered column={1}>
+            <Descriptions.Item label="Created On">{selectedRecord.createdOn}</Descriptions.Item>
+            <Descriptions.Item label="Updated On">{selectedRecord.updatedOn}</Descriptions.Item>
+            <Descriptions.Item label="isActive">{selectedRecord.isActive}</Descriptions.Item>
+            <Descriptions.Item label="isDeleted">{selectedRecord.isDeleted}</Descriptions.Item>
+            <Descriptions.Item label="State">{selectedRecord.state}</Descriptions.Item>
+            <Descriptions.Item label="District">{selectedRecord.district}</Descriptions.Item>
+            <Descriptions.Item label="Contact Number">{selectedRecord.contactNumber}</Descriptions.Item>
+          </Descriptions>
+
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 }

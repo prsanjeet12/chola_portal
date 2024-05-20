@@ -121,14 +121,17 @@ const ApiTable: React.FC = () => {
   ];
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container 
+    mx-auto p-4  font-montserrat">
       <Table
         dataSource={apiData}
         columns={columns}
         size='small'
-        rowClassName={`text-[15px] highlight-border `}
+        rowClassName={`text-[15px] 
+        highlight-border `}
         pagination={false}
-        className="ml-2 mr-3 font-poppins mt-5 bg-white text-black custom-table overflow-hidden font-semibold"
+        className="ml-2 mr-5 font-montserrat mt-5 bg-white text-black custom-table 
+        overflow-hidden  font-semibold"
       />
     </div>
   );

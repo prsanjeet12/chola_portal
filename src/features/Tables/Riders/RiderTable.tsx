@@ -1,59 +1,38 @@
-import React, { useState,useRef, useEffect } from 'react';
-import { Button, Drawer, Table, Space, Tag, Input , Collapse,Popover,Modal,Select,DatePicker} from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined,SearchOutlined ,FilterOutlined,MoreOutlined, DownOutlined ,CloseOutlined} from '@ant-design/icons';
-
-
-
-import type { FilterConfirmProps } from 'antd/es/table/interface';
-
-import type { ColumnsType, ColumnType } from 'antd/es/table';
-import type { InputRef } from 'antd';
-
+import React, { useState, useRef, useEffect } from 'react';
+import { Button, Table, Space, Tag, Modal, Drawer ,Descriptions} from 'antd';
+import { EyeOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
-
-
-
-// import {
-//   dummyDrivers,
-//   // Import other necessary data or components
-// } from '../../Data/DummyDriver';
 
 
 const { confirm } = Modal;
 
- type RiderType = {
+type RiderType = {
   id: number;
   firstName: string;
   lastName: string;
   phoneNo: string;
-  verified: boolean;
-  companyCode:string,
-    dob: Date;
+  email: string;
+  city: string;
+  country: string;
+  companyCode: string;
+  dob: Date;
+  gender: string;
   profileImage: string;
   bloodGroup: string;
   registeredOn: Date;
-  updatedOn: Date;
-  // ... other properties
 };
 
 type DataIndex = keyof RiderType;
-interface MoreOptionsProps {
-  id: string | number; 
-}
-
 
 const RiderTable: React.FC = () => {
- 
-
-
   const [loading, setLoading] = useState(false);
-  // const [Drivers, setDrivers] = useState(riderfilter);
   const [visible, setVisible] = useState(false); // State to manage modal visibility
   const [editedUser, setEditedUser] = useState<RiderType | null>(null); 
-  // const [filters, setFilters] = useState<{ [key: string]: any }>({});
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedRider, setSelectedRider] = useState<RiderType | null>(null);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
-  const searchInput = useRef<InputRef>(null);
+  const searchInput = useRef(null);
   const [Riders, setRiders] = useState<RiderType[]>([]);
 
   useEffect(() => {
@@ -70,13 +49,17 @@ const RiderTable: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         };
-        const response = await axios.get('https://chola-web-app.azurewebsites.net/api/admin/get-all-rider?page=1&pageSize=4 ', config);
-        console.log(response.data);
-        const transformedData = response.data.map((item:any) => ({
+        const response = await axios.get('https://chola-web-app.azurewebsites.net/api/admin/get-all-rider?page=1&pageSize=4', config);
+        console.table(response.data);
+        const transformedData = response.data.map((item: any) => ({
           id: item.id,
           firstName: item.user.firstName,
           lastName: item.user.lastName,
           phoneNo: item.user.phoneNo,
+          email: item.user.email,
+          profileImage: item.user.profileImage,
+          gender: item.user.gender,
+          country: item.user.country,
           verified: null,
           city: item.user.city,
           companyCode: null,
@@ -84,142 +67,50 @@ const RiderTable: React.FC = () => {
           bloodGroup: item.user.bloodGroup,
         }));
         setRiders(transformedData);
-        // Do something with transformedData, such as setting it to state
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
 
-
-    // Function to handle opening the modal and setting the edited user
-    const openEditModal = (user: RiderType) => {
-      setVisible(true);
-      setEditedUser(user);
-    };
-  
-    // Function to handle closing the modal
-    const closeEditModal = () => {
-      setVisible(false);
-      setEditedUser(null);
-    };
-  
-    // Function to handle saving the edited user data
-    const saveEditedUser = () => {
-      // Your logic to save the edited user data goes here
-      // For simplicity, let's just close the modal for now
-      closeEditModal();
-    };
-  
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex,
-  ) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
+  const showDeleteConfirm = (id: string | number) => {
+    confirm({
+      title: 'Are you sure you want to delete this item?',
+      icon: <ExclamationCircleOutlined />,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        console.log('Delete:', id); 
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   };
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText('');
+  const handleDrawerOpen = (rider: RiderType) => {
+    setSelectedRider(rider);
+    setDrawerVisible(true);
   };
 
-  
-  
-const showDeleteConfirm = (id:string |number) => {
-  confirm({
-    title: 'Are you sure you want to delete this item?',
-    icon: <ExclamationCircleOutlined />,
-    okText: 'Yes',
-    okType: 'danger',
-    cancelText: 'No',
-    onOk() {
-      console.log('Delete:', id); 
-    },
-    onCancel() {
-      console.log('Cancel');
-    },
-  });
-};
+  const handleDrawerClose = () => {
+    setDrawerVisible(false);
+    setSelectedRider(null);
+  };
 
-  // const onFetchMore = () => {
-  //   setLoading(true);
-  //   setTimeout(() => {
-  //     const newData = riderfilter.slice(Drivers.length, Drivers.length + 10);
-  //     setDrivers((prevData) => [...prevData, ...newData]);
-  //     setLoading(false);
-  //   }, 1000);
-  // };
-
-  // const { tableRef } = useInfiniteScroll({
-  //   data: Drivers,
-  //   onFetchMore,
-  //   loading,
-  // });
-
- 
-
-
-
-
- 
- 
- 
-  const MoreOptions: React.FC<{ rider: RiderType }> = ({ rider }) => (
-    <Space direction="vertical">
-      <Button type="text" icon={<EyeOutlined />} onClick={() => console.log('View:', rider.id)}>
-        View
-      </Button>
-      <Button type="text" icon={<EditOutlined />} onClick={() => openEditModal(rider)}>
-        Edit
-      </Button>
-      <Button type="text" icon={<DeleteOutlined />} onClick={() => showDeleteConfirm(rider.id)}>
-        Delete
-      </Button>
-    </Space>
-  );
-  const colums=[
+  const columns = [
+    { title: 'Rider Id', dataIndex: 'id', key: 'id' },
+    { title: 'First Name', dataIndex: 'firstName', key: 'firstName' },
+    { title: 'Last Name', dataIndex: 'lastName', key: 'lastName' },
+    { title: 'Phone No', dataIndex: 'phoneNo', key: 'phoneNo' },
+    { title: 'Email', dataIndex: 'email', key: 'email' },
+    { title: 'Company Code', dataIndex: 'companyCode', key: 'companyCode' },
     {
-      title: 'Rider Id',
-      dataIndex:'id',
- 
-      key:'id',
-    
-    },
-    {
-      title: 'FirstName',
-      dataIndex: 'firstName',
-     
-      key: 'firstName',
-    
-    },
-    {
-      title: 'LastName',
-      dataIndex: 'lastName',
- 
-      key: 'lastName',
-      
-    },
-    {
-      title: 'PhoneNo',
-      dataIndex: 'phoneNo',
-   
-      key: 'phoneNo',
-     
-    },
-    {
-      title:'CompanyCode',
-      dataIndex:'companyCode',
-    
-      key:'companyCode',
-     
-    },{
       title: 'Verified',
       dataIndex: 'verified',
       key: 'verified',
@@ -227,101 +118,62 @@ const showDeleteConfirm = (id:string |number) => {
         <Tag color={verified ? 'green' : 'red'}>{verified ? 'Yes' : 'No'}</Tag>
       ),
     },
-    {
-      title: 'DOB',
-      dataIndex: 'dob',
-      key: 'dob',
-      // render: (dob) => new Date(dob).toLocaleDateString(),
-      // sorter:(a:RiderType,b:RiderType)=>a.id-b.id,
-    },
+
     {
       title: 'Profile',
       dataIndex: 'profileImage',
       key: 'profileImage',
-      width:100,
-      // render: (profileImage) => (
-      //   <img src={profileImage} alt="Profile" className="rounded-full w-10 h-10" />
-      // ),
+     
     },
     {
-      title: 'Blood Group',
-      dataIndex: 'bloodGroup',
-      key: 'bloodGroup',
-      sorter:(a:RiderType,b:RiderType)=>a.id-b.id,
+      title: 'Action',
+      key: 'action',
+      render: (record: RiderType) => (
+        <Space size="middle">
+          <Button type="text" icon={<EyeOutlined />} onClick={() => handleDrawerOpen(record)}>View</Button>
+          {/* <Button type="text" icon={<EditOutlined />} onClick={() => console.log('Edit:', record.id)}>Edit</Button>
+          <Button type="text" icon={<DeleteOutlined />} onClick={() => showDeleteConfirm(record.id)}>Delete</Button> */}
+        </Space>
+      ),
     },
-    // {
-    //   title: 'Registered On',
-    //   dataIndex: 'registeredOn',
-    //   key: 'registeredOn',
-    //   // render: (registeredOn) => new Date(registeredOn).toLocaleDateString(),
-    //   // sorter:(a:RiderType,b:RiderType)=>a.id-b.id,
-    // },
-    // {
-    //   title: 'Updated On',
-    //   dataIndex: 'updatedOn',
-    //   key: 'updatedOn',
-    //   // render: (updatedOn) => new Date(updatedOn).toLocaleDateString(),
-    //   // sorter:(a:RiderType,b:RiderType)=>a.id-b.id,
-    // },
-    // {
-    //   title: 'Action',
-    //   key: 'Action',
-    //   width:90,
-    //   render: (_, record) => (
-    //     <Popover content={<MoreOptions rider={record} />} title="Actions">
-    //       <button className=' text-blacky underline hover:text-purple-800  px-4 py-1 rounded-md'>More</button>
-    //     </Popover>
-    //   ),
-    // },
-  ]
-  
+  ];
 
-
-// const dragProps = {
-//   onDragEnd(fromIndex: number, toIndex: number) {
-//     const updatedColumns = [...columns];
-//     const item = updatedColumns.splice(fromIndex, 1)[0];
-//     updatedColumns.splice(toIndex, 0, item);
-//     setColumns(updatedColumns);
-//   },
-//   nodeSelector: 'th',
-// };
-
- 
-  
   return (
-    <div className='overflow-x-auto' >
- <h1 className='text-black 
-      text-3xl font-bold ml-4 mt-3'>Riders</h1>
-      <div className='bg-white mt-20 ml-10 mr-10'>
-     
-   
+    <div className='overflow-x-auto h-[550px]'>
+      <h1 className='text-black text-3xl font-bold ml-4 mt-3'>Riders</h1>
+      <div className='bg-white mt-10 ml-10 mr-10'>
+        <Table<RiderType>
+          columns={columns}
+          dataSource={Riders}
+          rowKey="id"
+          size="large"
+          className="font-semibold font-montserrat"
+          loading={loading}
+        />
+        <Drawer
+          title="Rider Details"
+          width={400}
+          onClose={handleDrawerClose}
+          visible={drawerVisible}
+        >
+          {selectedRider && (
+            <div>
+             
+             <Descriptions className='font-montserrat font-semibold' bordered column={1}>
 
-     
-     
-   {/* <ReactDragListView.DragColumn {...dragProps}> */}
-     <Table<RiderType>
-       columns={colums}
-       dataSource={Riders}
-       rowKey="id"
-      
-      
-       size="large"
-       className="font-semibold font-montserrat"
-       
-       // onChange={handleTableChange}
-      
-       loading={loading}
-      
-       pagination={false}  
-      
-     />
-  
-   
-  
+              <Descriptions.Item label="City">{selectedRider.city}</Descriptions.Item>
+              <Descriptions.Item label="Country">{selectedRider.country}</Descriptions.Item>
+              <Descriptions.Item label="Date of Birth">{new Date(selectedRider.dob).toLocaleDateString()}</Descriptions.Item>
+              <Descriptions.Item label="Gender">{selectedRider.gender}</Descriptions.Item>
+              <Descriptions.Item label="Blood Group">{selectedRider.bloodGroup}</Descriptions.Item>
+              <Descriptions.Item label="Registered On">{new Date(selectedRider.registeredOn).toLocaleDateString()}</Descriptions.Item>
+            </Descriptions>
+            </div>
+          )}
+        </Drawer>
       </div>
-      
     </div>
   );
-                }
+};
+
 export default RiderTable;

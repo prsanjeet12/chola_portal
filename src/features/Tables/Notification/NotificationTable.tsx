@@ -1,123 +1,105 @@
-// NotificationTable.tsx
-import React, { useState } from 'react';
-import { Table,Modal } from 'antd';
-import NewNotificationForm from './NotificationForm';
+import React from 'react';
+import { Table, Button } from 'antd';
 
-interface Notification {
-  id: string;
-  title: string;
-  body: string;
-  to: string;
-  timestamp: string;
-  status: string;
-  createdBy: string;
-}
+const columns = [
+  {
+    title: 'Notifi... ID',
+    dataIndex: 'id',
+    key: 'id',
+  },
+  {
+    title: 'Notification Type',
+    dataIndex: 'type',
+    key: 'type',
+  },
+  {
+    title: 'Timestamp',
+    dataIndex: 'timestamp',
+    key: 'timestamp',
+  },
+  {
+    title: 'Content',
+    dataIndex: 'content',
+    key: 'content',
+    render: (text: string) => (
+      <span className="whitespace-nowrap overflow-hidden overflow-ellipsis w-40 block">
+        {text}
+      </span>
+    ),
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    key: 'status',
+  },
+  {
+    title: ' Source',
+    dataIndex: 'source',
+    key: 'source',
+  },
+  // New columns for Company Code and Created By
+  {
+    title: 'Company Code',
+    dataIndex: 'companyCode',
+    key: 'companyCode',
+  },
+  {
+    title: 'Created By',
+    dataIndex: 'createdBy',
+    key: 'createdBy',
+  },
+  {
+    title: 'Action',
+    key: 'action',
+    render: (text: any, record: any) => (
+      <Button type="primary" onClick={() => handleAction(record)}>Action</Button>
+    ),
+  },
+];
 
-interface Props {
-  notifications: Notification[];
-}
+const data = [
+  {
+    id: '001',
+    type: 'Onboarding',
+    timestamp: '2024-05-12 09:30',
+    content: 'Welcome to our app! Your journey begins now.',
+    status: true,
+    source: 'User action',
+    companyCode: 'XYZ123',
+    createdBy: 'John Doe',
+  },
+  {
+    id: '002',
+    type: 'Ride Booking',
+    timestamp: '2024-05-12 10:15',
+    content: 'Your ride is on the way. Please be ready.',
+    status: false,
+    source: 'System event',
+    companyCode: 'ABC456',
+    createdBy: 'Jane Smith',
+  },
+  // Add more data as needed
+];
 
-const NotificationTable: React.FC<Props> = ({ notifications }) => {
+const handleAction = (record: any) => {
+  // Handle action logic here, for example, display a modal or perform an action.
+  console.log('Action clicked for:', record);
+};
 
-    const [isModalVisible, setIsModalVisible]=useState(false)
-
-    const handleCreateNotification = () => {
-        setIsModalVisible(true);
-      };
-    
-      const handleCloseModal = () => {
-        setIsModalVisible(false);
-      };
-    
-  const columns = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Body',
-      dataIndex: 'body',
-      key: 'body',
-    },
-    {
-      title: 'To',
-      dataIndex: 'to',
-      key: 'to',
-    },
-    {
-        title: 'Created By',
-        dataIndex: 'createdBy',
-        key: 'createdBy',
-      },
-    {
-      title: 'Timestamp',
-      dataIndex: 'timestamp',
-      key: 'timestamp',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-    },
-   
-  ];
-  const data =[
-    {
-      id: '1',
-      title: 'New Message',
-      body: 'You have a new message from John Doe',
-      to: 'drivers',
-      timestamp: '2024-05-10 09:30:00',
-      status: 'Active',
-      createdBy: 'Prsanjeet',
-    },
-    {
-      id: '2',
-      title: 'Reminder',
-      body: 'Don\'t forget to  get coupon',
-      to: 'Riders',
-      timestamp: '2024-05-11 14:00:00',
-      status: 'Active',
-      createdBy: 'Nikil',
-    },
-  ]
-
+const NotificationTable: React.FC = () => {
   return (
-  
-  <div
-  className='overflow-x-auto'
-  
-  >
-<div className='bg-[#fffff]  mt-20 ml-10 mr-10'>
-<div className="flex justify-end bg-white">
-    <button className="mr-8 bg-gray-950
-           text-white px-4 py-2 rounded-lg 
-           mt-6 hover:scale-105 transition 
-          duration-300 ease-in-out hover:bg-purple-400" onClick={ handleCreateNotification}>
-        Create New Notification
-    </button>
-</div>
-<Table
-  rowClassName={`text-[#2e2633] text-[14px]`}
-  pagination={false}
-dataSource={data}
-className='font-semibold font-poppins'
-columns={columns} />
-<Modal
- title="Send New Custom Notification"
- visible={isModalVisible}
- onCancel={handleCloseModal}
- footer={null}
-
->
-<NewNotificationForm visible={isModalVisible} onClose={handleCloseModal} />
-</Modal>
-</div>
-  </div>
-
-
-)
+    <div className='font-montserrat '>
+      <div className='mt-20 mr-10 ml-10 font-semibold'>
+        <Table
+          columns={columns}
+          dataSource={data}
+          pagination={false}
+          bordered
+          className="w-full"
+        />
+      </div>
+    </div>
+  );
 };
 
 export default NotificationTable;
